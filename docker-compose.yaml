@@ -1,0 +1,34 @@
+version: '3'
+services:
+  arangodb:
+    image: arangodb:latest
+    environment:
+      - ARANGO_ROOT_PASSWORD=${ARANGODB_ROOT_PASSWORD}
+      - ARANGO_NO_AUTH=1
+    ports:
+      - "8530:8529"
+    expose:
+      - "8530"
+    networks:
+      - mynetwork
+
+  test-integration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - arangodb
+    environment:
+      - USE_SSL=${USE_SSL}
+      - MAIN_PORT=${MAIN_PORT}
+      - ARANGODB_HOST=${ARANGODB_HOST}
+      - ARANGODB_DATABASE=${ARANGODB_DATABASE}
+      - ARANGODB_USER=${ARANGODB_USER}
+      - ARANGODB_PASSWORD=${ARANGODB_PASSWORD}
+    ports:
+      - "8080:8080"
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+    driver: bridge
